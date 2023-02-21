@@ -1,5 +1,0 @@
--r requirements.txt
-yamllint
-pre-commit
-python-dotenv
-flake8

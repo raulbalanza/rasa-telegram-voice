@@ -1,12 +1,18 @@
-FROM rasa/rasa:2.3.4-full
+FROM python:3.9.16-buster
 
-USER root
-RUN pip install --upgrade pip
+COPY requirements.txt /
 
-COPY *.py /app/
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN apt update
+RUN apt -y install ffmpeg
+RUN pip3 install -r requirements.txt
+RUN rasa telemetry disable
 
-EXPOSE 5005
+# Spanish time zone (can be changed)
+RUN ln -sf /usr/share/zoneinfo/Europe/Madrid /etc/localtime
+RUN echo "Europe/Madrid" > /etc/timezone
 
-USER 1001
+COPY . /app
+
+WORKDIR /app
+RUN rasa train
+CMD rasa run --enable-api --cors "*" --debug
